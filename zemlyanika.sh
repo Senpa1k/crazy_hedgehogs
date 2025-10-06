@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
-    echo "Usage: $0 <path> <size_of_dir> <size_limit>"
-    exit 1
-fi
-
 path=$1
 size_of_dir=$2
 size_limit=$3
@@ -33,7 +28,7 @@ if [ "$result" -gt "$size_limit" ]; then
         file_size=$(du "$path/$f" | awk '{print $1}')
         result=$((result - (file_size * 100 / size_of_dir)))
         m=$((m + 1))
-        if [ "$result" -le "$size_limit" ]; then
+	if [ "$result" -le "$((size_limit/(3/2)))" ]; then
             break
         fi
     done
@@ -45,12 +40,12 @@ if [ "$m" -gt 0 ]; then
     backup_file="$pwd_to_backup/backup_$(date +%Y%m%d_%H%M%S).tar.gz"
 
     echo "Archiving $m oldest files to: $backup_file"
-    tar -czPf "$backup_file" "${sorted_files[@]:0:$m}" --directory="$path"
+    tar -czPf "$backup_file" -C "$path" "${sorted_files[@]:0:$m}"
 
     if [ $? -eq 0 ]; then
         echo "Archive created successfully. Deleting archived files..."
         for ((i=0; i<m; i++)); do
-            rm -f "$path/${sorted_files[i]}"
+            rm -rf "$path/${sorted_files[i]}"
         done
         echo "Deleted $m old files."
     else
