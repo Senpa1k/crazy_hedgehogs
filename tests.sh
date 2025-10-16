@@ -14,7 +14,7 @@ show_log() {
     echo "Content of log:"
     ls -lh "$LOG_DIR"
     du -sh "$LOG_DIR"
-    echo "------"
+    
 }
 
 clean_log
