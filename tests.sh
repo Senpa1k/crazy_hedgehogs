@@ -11,19 +11,19 @@ clean_log() {
 }
 
 show_log() {
-    echo "Содержимое папки log:"
+    echo "Content of log:"
     ls -lh "$LOG_DIR"
     du -sh "$LOG_DIR"
     echo "------"
 }
 
 clean_log
-echo "=== TEST 1: пустая папка ==="
+echo "TEST 1: empty directory"
 bash "$SCRIPT" "$LOG_DIR" 90
 show_log
 
 clean_log
-echo "=== TEST 2: несколько маленьких файлов ==="
+echo "TEST 2: several small files"
 dd if=/dev/zero of="$LOG_DIR/file1.txt" bs=1M count=10
 dd if=/dev/zero of="$LOG_DIR/file2.txt" bs=20M count=1
 dd if=/dev/zero of="$LOG_DIR/file3.txt" bs=5M count=1
@@ -31,24 +31,24 @@ bash "$SCRIPT" "$LOG_DIR" 80
 show_log
 
 clean_log
-echo "=== TEST 3: много файлов выше лимита ==="
+echo "TEST 3: numerous files exceeding the limit"
 for i in {1..10}; do
     dd if=/dev/zero of="$LOG_DIR/file_$i.txt" bs=50M count=1
 done
 bash "$SCRIPT" "$LOG_DIR" 50
 show_log
-echo "Содержимое папки backup:"
+echo "Content of backup:"
 ls -lh "$BACKUP_DIR"
 
 clean_log
-echo "=== TEST 4: один большой файл ==="
+echo "TEST 4: one large file"
 dd if=/dev/zero of="$LOG_DIR/big_file.bin" bs=600M count=1
 bash "$SCRIPT" "$LOG_DIR" 50
 show_log
 ls -lh "$BACKUP_DIR"
 
 clean_log
-echo "=== TEST 5: файлы с одинаковым timestamp ==="
+echo "TEST 5: files with equal timestamps"
 for i in {1..3}; do
     dd if=/dev/zero of="$LOG_DIR/file_$i.txt" bs=200M count=1
 done
@@ -57,11 +57,11 @@ bash "$SCRIPT" "$LOG_DIR" 50
 show_log
 ls -lh "$BACKUP_DIR"
 
-echo "=== TEST 6: несуществующая папка ==="
+echo "TEST 6: non-existent directory"
 bash "$SCRIPT" "$HOME/lab/nonexistent" 50
 
 clean_log
-echo "=== TEST 7: много маленьких файлов, под лимитом ==="
+echo "TEST 7: numerous small files under the limit"
 for i in {1..20}; do
     dd if=/dev/zero of="$LOG_DIR/file_$i.txt" bs=10M count=1
 done
@@ -69,12 +69,12 @@ bash "$SCRIPT" "$LOG_DIR" 70
 show_log
 
 clean_log
-echo "=== TEST 8: маленький + большой файл ==="
+echo "TEST 8: one small and one large file"
 dd if=/dev/zero of="$LOG_DIR/small.txt" bs=5M count=1
 dd if=/dev/zero of="$LOG_DIR/huge.bin" bs=800M count=1
 bash "$SCRIPT" "$LOG_DIR" 60
 show_log
 ls -lh "$BACKUP_DIR"
 
-echo "=== Все тесты завершены ==="
+echo "All tests completed"
 
