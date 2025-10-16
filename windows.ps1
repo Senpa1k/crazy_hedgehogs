@@ -4,7 +4,6 @@ param (
     [Parameter(Mandatory=$true)][int]$SizeLimit
 )
 
-$sum = 0
 $m = 0
 $parentDir = Split-Path -Path $Path -Parent
 $backupDir = Join-Path -Path $parentDir -ChildPath "backup"
