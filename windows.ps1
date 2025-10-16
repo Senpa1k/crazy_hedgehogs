@@ -1,13 +1,12 @@
 param (
-    [Parameter(Mandatory=$true)][string]$Path,
-    [Parameter(Mandatory=$true)][int]$SizeOfDir,
-    [Parameter(Mandatory=$true)][int]$SizeLimit
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][int]$SizeOfDir,
+    [Parameter(Mandatory = $true)][int]$SizeLimit
 )
 
 $m = 0
 $parentDir = Split-Path -Path $Path -Parent
 $backupDir = Join-Path -Path $parentDir -ChildPath "backup"
-
 if (-not (Test-Path -Path $Path -PathType Container)) {
     Write-Output "Error: directory '$Path' does not exist."
     exit 1
@@ -24,7 +23,7 @@ if (-not (Test-Path -Path $backupDir -PathType Container)) {
 
 $currentSize = (Get-ChildItem -Path $Path -Recurse | Measure-Object -Property Length -Sum).Sum / 1KB
 $result = ($currentSize * 100 / $SizeOfDir)
-Write-Output "The directory is $result% full"
+Write-Output "The directory is $([math]::Round($result, 2))% full"
 
 $sortedFiles = Get-ChildItem -Path $Path | Sort-Object CreationTime
 
@@ -45,12 +44,15 @@ if ($result -gt $SizeLimit) {
 
 if ($m -gt 0) {
     $backupFile = Join-Path -Path $backupDir -ChildPath ("backup_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".zip")
-
     Write-Output "Archiving $m oldest files to: $backupFile"
+
     try {
         $filesToArchive = $sortedFiles | Select-Object -First $m
-        Compress-Archive -Path ($filesToArchive.FullName) -DestinationPath $backupFile 
-            foreach ($file in ($filesToArchive)) {
+        Compress-Archive -Path ($filesToArchive.FullName) -DestinationPath $backupFile -Force
+
+        if (Test-Path -Path $backupFile) {
+            Write-Output "Archive created successfully. Deleting archived files..."
+            foreach ($file in $filesToArchive) {
                 Remove-Item -Path $file.FullName -Recurse -Force
             }
             Write-Output "Deleted $m old files."
@@ -59,7 +61,7 @@ if ($m -gt 0) {
             exit 1
         }
     } catch {
-        Write-Output "Error: failed to create archive: $_ Files will not be deleted."
+        Write-Output "Error: failed to create archive: $_. Files will not be deleted."
         exit 1
     }
 } else {
