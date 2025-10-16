@@ -1,5 +1,5 @@
 #!/bin/bash
-
+GB=1048576
 path=$1
 size_limit=$2
 m=0
@@ -33,7 +33,7 @@ if [ "$current_percentage" -gt "$size_limit" ]; then
     for f in "${sorted_files[@]}"; do
         if [ -f "$path/$f" ]; then
             file_size=$(du -s "$path/$f" | awk '{print $1}')
-            percentage_reduction=$(( (file_size * 100) / total_size ))
+            percentage_reduction=$(( (file_size * 100) / GB ))
             current_percentage=$((current_percentage - percentage_reduction))
             m=$((m + 1))
             if [ "$current_percentage" -le "$((size_limit * 2 / 3))" ]; then

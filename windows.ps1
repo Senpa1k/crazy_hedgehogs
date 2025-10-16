@@ -15,7 +15,7 @@ if (-not (Test-Path -Path $Path -PathType Container)) {
 
 if (-not (Test-Path -Path $backupDir -PathType Container)) {
     try {
-        New-Item -Path $backupDir -ItemType Directory -Force | Out-Null
+        New-Item -Path $backupDir -ItemType Directory | Out-Null
     } catch {
         Write-Output "Cannot create backup directory: $_"
         exit 1
@@ -23,7 +23,7 @@ if (-not (Test-Path -Path $backupDir -PathType Container)) {
 }
 
 $currentSize = (Get-ChildItem -Path $Path -Recurse | Measure-Object -Property Length -Sum).Sum / 1KB
-$result = [math]::Round(($currentSize * 100 / $SizeOfDir), 2)
+$result = ($currentSize * 100 / $SizeOfDir)
 Write-Output "The directory is $result% full"
 
 $sortedFiles = Get-ChildItem -Path $Path | Sort-Object CreationTime
@@ -49,10 +49,7 @@ if ($m -gt 0) {
     Write-Output "Archiving $m oldest files to: $backupFile"
     try {
         $filesToArchive = $sortedFiles | Select-Object -First $m
-        Compress-Archive -Path ($filesToArchive.FullName) -DestinationPath $backupFile -Force
-
-        if (Test-Path -Path $backupFile) {
-            Write-Output "Archive created successfully. Deleting archived files..."
+        Compress-Archive -Path ($filesToArchive.FullName) -DestinationPath $backupFile 
             foreach ($file in ($filesToArchive)) {
                 Remove-Item -Path $file.FullName -Recurse -Force
             }
