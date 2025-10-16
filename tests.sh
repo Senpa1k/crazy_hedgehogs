@@ -2,7 +2,8 @@
 
 LOG_DIR="$HOME/lab/log"
 BACKUP_DIR="$HOME/lab/backup"
-SCRIPT="$HOME/lab/script.sh" 
+SCRIPT="$HOME/github/crazy_hedgehogs/script.sh"
+ 
 
 
 clean_log() {
@@ -49,7 +50,7 @@ ls -lh "$BACKUP_DIR"
 clean_log
 echo "=== TEST 5: файлы с одинаковым timestamp ==="
 for i in {1..3}; do
-    dd if=/dev/zero of="$LOG_DIR/file_$i.txt" bs=50M count=1
+    dd if=/dev/zero of="$LOG_DIR/file_$i.txt" bs=200M count=1
 done
 touch -t 202001010000 "$LOG_DIR"/*
 bash "$SCRIPT" "$LOG_DIR" 50

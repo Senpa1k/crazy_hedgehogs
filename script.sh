@@ -2,7 +2,6 @@
 
 path=$1
 size_limit=$2
-sum=0
 m=0
 
 if [ $# -ne 2 ]; then
